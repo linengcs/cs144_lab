@@ -4,6 +4,7 @@
 #include "byte_stream.hh"
 
 #include <cstdint>
+#include <set>
 #include <string>
 
 //! \brief A class that assembles a series of excerpts from a byte stream (possibly out of order,
@@ -14,6 +15,24 @@ class StreamReassembler {
 
     ByteStream _output;  //!< The reassembled in-order byte stream
     size_t _capacity;    //!< The maximum number of bytes
+    size_t _unread;
+    size_t _unassemble;
+    size_t _unaccept;
+    bool _eof;
+    bool _nevereof;
+    typedef struct bit {
+        size_t idx;
+        char data;
+        bool operator<(const bit &s) const {
+            if (idx == s.idx)
+                return false;
+            else
+                return idx < s.idx;
+        }
+
+    } bit;
+    // std::vector<bit> _buffer;
+    std::set<bit> _buffer;
 
   public:
     //! \brief Construct a `StreamReassembler` that will store up to `capacity` bytes.
